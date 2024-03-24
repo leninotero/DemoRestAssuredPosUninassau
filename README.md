@@ -1,5 +1,6 @@
 # DemoRestAssuredPosUninassau
-Este é um projeto de exemplo para automação de testes de API utilizando o framework RestAssured e o Allure para geração de report
+Este é um projeto de exemplo de automação de testes de API utilizando o framework RestAssured e o Allure para geração de report. 
+A API utlizada para os testes foi a [ServRest](https://serverest.dev/), API pública disponível na internet para fins de estudo e práticas.
 
 ## Pre-requisitos
 ```
