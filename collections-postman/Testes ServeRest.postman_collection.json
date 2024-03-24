@@ -1,0 +1,348 @@
+{
+	"info": {
+		"_postman_id": "f5ce6a48-23d6-4712-b450-680ba80ecc96",
+		"name": "Testes ServeRest",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "27659697"
+	},
+	"item": [
+		{
+			"name": "[TC-001] Testes do Login",
+			"item": [
+				{
+					"name": "[TC001-001] Login com sucesso",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"var jsonData = pm.response.json();",
+									"pm.environment.set(\"token\", jsonData.authorization);",
+									"",
+									"pm.test(\"Deve Validar o schema login\", () => {",
+									"    let Ajv = require('ajv');",
+									"",
+									"    //Definir que sejam exibidos todos os erros quando ouver",
+									"    ajv = new Ajv({allErros: true});",
+									"",
+									"    //capturar a variavel do schema login definida no pre-request",
+									"    const showSchema = JSON.parse(pm.variables.get(\"schemaLogin\"));",
+									"",
+									"    //validar. os schemas, o do response com o definido na variavel de pre-request",
+									"    const returnValidate = ajv.validate(showSchema, jsonData);",
+									"",
+									"    //armazenar os possíveis erros encontrados",
+									"    const jsonErrors = JSON.stringify(ajv.erros);",
+									"",
+									"    //verificar se os schemas são iguais",
+									"    pm.expect(returnValidate, jsonErrors).to.be.true;",
+									"",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const schemaLogin = {",
+									"  \"type\": \"object\",",
+									"  \"properties\": {",
+									"    \"message\": {",
+									"      \"type\": \"string\"",
+									"    },",
+									"    \"authorization\": {",
+									"      \"type\": \"string\"",
+									"    }",
+									"  },",
+									"  \"required\": [",
+									"    \"message\",",
+									"    \"authorization\"",
+									"  ]",
+									"}",
+									"",
+									"//Armazeno o schema numa variavel de ambiente",
+									"pm.variables.set(\"schemaLogin\", JSON.stringify(schemaLogin));"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"fulano@qa.com\",\n    \"password\": \"teste\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "[TC-003] Testes do Produto",
+			"item": [
+				{
+					"name": "[TC-003-001] Cadastro de Produtos com Sucesso",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"var resp = pm.response.json()",
+									"pm.environment.set(\"product_id\", resp._id)"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nome\": \"Mouse pad possitivo\",\n    \"preco\": 10,\n    \"descricao\": \"Apoio ergonomico para as mãos\",\n    \"quantidade\": 100\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/produtos",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"produtos"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[TC-003-002] Consulta de produto por ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/produtos?_id=6DzFP2DrcpLtSXxE",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"produtos"
+							],
+							"query": [
+								{
+									"key": "nome",
+									"value": "Produto QkKKOs5Pop",
+									"disabled": true
+								},
+								{
+									"key": "preco",
+									"value": "639",
+									"disabled": true
+								},
+								{
+									"key": "descricao",
+									"value": "Descrição JjMjcNJr474zz3x4gz8C",
+									"disabled": true
+								},
+								{
+									"key": "quantidade",
+									"value": "351",
+									"disabled": true
+								},
+								{
+									"key": "_id",
+									"value": "6DzFP2DrcpLtSXxE"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[TC-003-003] Alteração de dados no produto",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nome\": \"Mouse pad possitivo XN35\",\n    \"preco\": 10,\n    \"descricao\": \"Apoio ergonomico para as pulso\",\n    \"quantidade\": 100\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/produtos/{{product_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"produtos",
+								"{{product_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[TC-003-004] Remover produto por ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/produtos/{{product_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"produtos",
+								"{{product_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "[TC-002] Testes de Usuarios",
+			"item": [
+				{
+					"name": "[TC-002] Testes de Usuarios",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nome\": \"Teste de Usuario\",\n    \"email\": \"{{email}}\",\n    \"password\": \"{{password}}\",\n    \"administrador\": \"true\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/usuarios",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"usuarios"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
