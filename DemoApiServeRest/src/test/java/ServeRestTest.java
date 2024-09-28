@@ -14,23 +14,27 @@ import static io.restassured.module.jsv.JsonSchemaValidator.*;
 class ServeRestTest {
     private static String token;
     private static String productId;
+    static final int statusCode200 = 200;
+    static final int statusCode201 = 201;
+    static final String path = "/produtos";
 
     @Test
     @Order(1)
-    void testDadoEmailESenhaValidoQuandoFacoLoginEntaoValidoStatusCode200(){
+    @DisplayName("TC001 - Login com Informações Válidas")
+    void testDado_EmailESenhaValidos_Quando_FacoLogin_Entao_ValidoStatus200(){
         baseURI = "https://serverest.dev";
 
-         token = given()
-                        .filter(new AllureRestAssured())
-                        .body("{\n" +
-                                "    \"email\": \"fulano@qa.com\",\n" +
-                                "    \"password\": \"teste\"\n" +
-                                "}")
-                        .contentType(ContentType.JSON)
+        token = given()
+                    .filter(new AllureRestAssured())
+                    .body("{\n" +
+                            "  \"email\": \"fulano@qa.com\",\n" +
+                            "  \"password\": \"teste\"\n" +
+                            "}")
+                    .contentType(ContentType.JSON)
                 .when()
                         .post("/login")
                 .then()
-                        .statusCode(200)
+                        .statusCode(statusCode200)
                         .body("message", equalTo("Login realizado com sucesso"))
                         .extract()
                             .path("authorization");
@@ -38,73 +42,82 @@ class ServeRestTest {
 
     @Test
     @Order(2)
-    void testDadoTokenValidoQuandoCadastroUmProdutoEntaoValidoStatusCode201(){
+    @DisplayName("TC002 - Cadastrar Produto")
+    void testDado_UmTokenValido_Quando_CadastroUmProduto_Entao_ValidoStatus201(){
         productId = given()
-                            .body("{\n" +
-                                    "    \"nome\": \"Mouse Dell PX450\",\n" +
-                                    "    \"preco\": 250,\n" +
-                                    "    \"descricao\": \"Mouse a laser com otimo DPI\",\n" +
-                                    "    \"quantidade\": 200\n" +
-                                    "}")
-                            .contentType(ContentType.JSON)
-                            .header("Authorization", token)
+                        .filter(new AllureRestAssured())
+                        .body("{\n" +
+                                "  \"nome\": \"WebCam Logitech\",\n" +
+                                "  \"preco\": 800,\n" +
+                                "  \"descricao\": \"Webcam com ótima qualidade de video\",\n" +
+                                "  \"quantidade\": 100\n" +
+                                "}")
+                        .contentType(ContentType.JSON)
+                        .header("Authorization", token)
                     .when()
-                            .post("/produtos")
+                        .post(path)
                     .then()
-                            .statusCode(201)
-                            .body("message", equalTo("Cadastro realizado com sucesso"))
-                            .extract()
-                                .path("_id");
+                        .statusCode(statusCode201)
+                        .body("message", equalTo("Cadastro realizado com sucesso"))
+                        .extract()
+                            .path("_id");
     }
 
     @Test
     @Order(3)
-    void testDadoUmProdutoCadastradoQuandoConsultoInformacoesEntaoValidoStatusCode200(){
+    @DisplayName("TC003 - Listar produto por ID")
+    void testDado_ProdutoCadastrado_Quando_ConsultoInformacoes_Entao_validoStatus200(){
         given()
+                .filter(new AllureRestAssured())
                 .pathParams("id", productId)
-        .when()
-                .get("produtos/{id}")
-        .then()
-                .statusCode(200)
-                .body("nome", equalTo("Mouse Dell PX450"))
-                .body("preco", equalTo(250))
-                .body("descricao", equalTo("Mouse a laser com otimo DPI"))
-                .body("quantidade", equalTo(200))
+            .when()
+                .get(path+"/{id}")
+            .then()
+                .statusCode(statusCode200)
+                .body("nome", equalTo("WebCam Logitech"))
+                .body("preco", equalTo(800))
+                .body("descricao", equalTo("Webcam com ótima qualidade de video"))
+                .body("quantidade", equalTo(100))
                 .body("_id", equalTo(productId))
+                .contentType(ContentType.JSON)
             .assertThat()
                 .body(matchesJsonSchemaInClasspath("products-schema.json"));
     }
 
     @Test
     @Order(4)
-    void testDadoTokenValidoQuandoModificoDadosEntaoValidoStatusCode200(){
+    @DisplayName("TC004 - Atualizar Produto")
+    void testDado_ProdutoCadastrado_Quando_AtualizoAsInformacoes_Entao_ValidoStatus200(){
         given()
+                .filter(new AllureRestAssured())
                 .pathParams("id", productId)
                 .body("{\n" +
-                        "    \"nome\": \"Mouse Dell LT189\",\n" +
-                        "    \"preco\": 275,\n" +
-                        "    \"descricao\": \"Mouse a laser com 180 DPI\",\n" +
-                        "    \"quantidade\": 200\n" +
+                        "  \"nome\": \"WebCam Logitech 1800DPI\",\n" +
+                        "  \"preco\": 750,\n" +
+                        "  \"descricao\": \"Webcam com ótima qualidade de video e visão noturna\",\n" +
+                        "  \"quantidade\": 90\n" +
                         "}")
                 .contentType(ContentType.JSON)
                 .header("Authorization", token)
-        .when()
-                .put("/produtos/{id}")
-        .then()
-                .statusCode(200)
+            .when()
+                .put(path+"/{id}")
+            .then()
+                .statusCode(statusCode200)
                 .body("message", equalTo("Registro alterado com sucesso"));
     }
 
     @Test
     @Order(5)
-    void testDadoTokenValidoQuandoExcluoProdutoEntaoValidoStatusCode200(){
+    @DisplayName("TC005 - Remover Produto")
+    void testDado_ProdutoCadastrado_Quando_DeletoProduto_Entao_ValidoStatus200(){
         given()
+                .filter(new AllureRestAssured())
                 .pathParams("id", productId)
                 .header("Authorization", token)
-        .when()
-                .delete("/produtos/{id}")
-        .then()
-                .statusCode(200)
+            .when()
+                .delete(path+"/{id}")
+            .then()
+                .statusCode(statusCode200)
                 .body("message", equalTo("Registro excluído com sucesso"));
     }
 }
