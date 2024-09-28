@@ -14,8 +14,8 @@ JUnit 5
 ## Execução dos Testes
 Os testes foram desenvolvidos em Java e se encontram na pasta test do projeto. Foi desenvolvida também uma validação de schema, o arquivo json do schema se encontra na pasta resources
 ```
-execute os testes a partir do menu fazendo click direito em cima do arquivo de teste
-após executar o teste, execute o comando allure serve para visualizar o relatorio dos testes
+- Execute os testes a partir do menu fazendo click direito em cima do arquivo de teste
+- Após executar o teste, execute o comando <strong>allure serve</strong>, na pasta principal do projeto, para visualizar o relatorio dos testes
 ```
 
 ## Links importantes
